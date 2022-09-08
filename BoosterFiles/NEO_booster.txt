@@ -1,96 +1,96 @@
-01 Isshin, Two Heavens as One
-01 Prodigy's Prototype
-01 Kappa Tech-Wrecker
-01 Dokuchi Silencer
-01 Greater Tanuki
-01 Imperial Subduer
-01 Grafted Growth
-01 Mothrider Patrol
-01 Iron Apprentice
-01 Bearer of Memory
-01 Lucky Offering
-01 Wind-Scarred Crag
-01 Towashi Songshaper
-01 Moon-Circuit Hacker
-01 Harmonious Emergence
-
-01 Kami of Transience
-01 Reito Sentinel
-01 Dragonspark Reactor
-01 Prosperous Thief
-01 Gift of Wrath
-01 Simian Sling
-01 Jungle Hollow
-01 Mukotai Ambusher
-01 Commune with Spirits
-01 Debt to the Kami
-01 The Shattered States Era // Nameless Conqueror
-01 Tamiyo's Safekeeping
-01 Kami of Terrible Secrets
-01 Mountain
-01 Wind-Scarred Crag
-
-01 March of Otherworldly Light
-01 Heiko Yamazaki, the General
-01 Prodigy's Prototype
-01 Norika Yamazaki, the Poet
-01 Uncharted Haven
-01 Bearer of Memory
-01 Spell Pierce
-01 Short Circuit
-01 Ecologist's Terrarium
-01 Imperial Oath
-01 Searchlight Companion
-01 Greater Tanuki
-01 Bloodfell Caves
-01 Island
-01 Repel the Vile
-
-01 Takenuma, Abandoned Mire
-01 Bronzeplate Boar
-01 Secluded Courtyard
-01 Patchwork Automaton
-01 Season of Renewal
-01 Thundersteel Colossus
-01 Light the Way
-01 Chainflail Centipede
-01 Dokuchi Shadow-Walker
-01 Scrapyard Steelbreaker
-01 Ironhoof Boar
-01 Ninja's Kunai
-01 Blossoming Sands
-01 Explosive Entry
-01 Repel the Vile
-
-01 Invoke the Ancients
-01 Malicious Malfunction
-01 Assassin's Ink
-01 Gloomshrieker
-01 Short Circuit
-01 Intercessor's Arrest
-01 Imperial Oath
-01 Kami of Restless Shadows
-01 Forest
-01 Kaito's Pursuit
-01 Chainflail Centipede
-01 Scoured Barrens
-01 Golden-Tail Disciple
-01 Spirited Companion
-01 Spirited Companion
-
-01 Surgehacker Mech
-01 Go-Shintai of Boundless Vigor
+01 Reckoner Bankbuster
 01 Walking Skyscraper
-01 Jukai Naturalist
-01 Undercity Scrounger
+01 Reality Heist
+01 Okiba Salvage
+01 Rugged Highlands
+01 Blossoming Sands
+01 You Are Already Dead
+01 Dragonfly Suit
+01 Thundersteel Colossus
+01 Reckoner's Bargain
+01 Fang of Shigeki
+01 Experimental Synthesizer
+01 Wind-Scarred Crag
+01 Network Terminal
+01 Twisted Embrace
+
+01 Soul Transfer
+01 Awakened Awareness
+01 Futurist Operative
+01 Malicious Malfunction
+01 Tamiyo's Compleation
+01 Spell Pierce
+01 Master's Rebuke
+01 Papercraft Decoy
+01 Ecologist's Terrarium
+01 Ancestral Katana
+01 Chainflail Centipede
+01 Imperial Subduer
+01 Futurist Sentinel
+01 Gift of Wrath
+01 Wind-Scarred Crag
+
+01 Thousand-Faced Shadow
+01 Malicious Malfunction
+01 Hotshot Mechanic
+01 When We Were Young
+01 Futurist Sentinel
+01 Disruption Protocol
+01 Repel the Vile
+01 Tales of Master Seshiro // Seshiro's Living Legacy
+01 Scoured Barrens
+01 Ironhoof Boar
 01 Coiling Stalker
-01 Jukai Trainee
-01 Iron Apprentice
-01 Simian Sling
+01 Moonsnare Specialist
+01 Imperial Subduer
+01 Debt to the Kami
+01 Imperial Oath
+
+01 Mukotai Soulripper
+01 Hotshot Mechanic
+01 Webspinner Cuff
+01 Boseiju Reaches Skyward // Branch of Boseiju
+01 Dokuchi Shadow-Walker
+01 Crackling Emergence
+01 Mnemonic Sphere
+01 Suit Up
+01 Papercraft Decoy
+01 Seven-Tail Mentor
+01 Armguard Familiar
+01 Kami of Restless Shadows
+01 Searchlight Companion
 01 The Shattered States Era // Nameless Conqueror
-01 Dismal Backwater
-01 Befriending the Moths // Imperial Moth
-01 Okiba Reckoner Raid // Nezumi Road Captain
-01 Ninja's Kunai
+01 Era of Enlightenment // Hand of Enlightenment
+
+01 Kotose, the Silent Spider
+01 Boseiju Reaches Skyward // Branch of Boseiju
+01 Naomi, Pillar of Order
+01 Towashi Guide-Bot
+01 Towashi Songshaper
+01 Thundersteel Colossus
+01 Bamboo Grove Archer
 01 Commune with Spirits
+01 Chainflail Centipede
+01 Scrapyard Steelbreaker
+01 Skyswimmer Koi
+01 Intercessor's Arrest
+01 Bearer of Memory
+01 Saiba Trespassers
+01 Network Terminal
+
+01 Tatsunari, Toad Rider
+01 Enormous Energy Blade
+01 Covert Technician
+01 Blade-Blizzard Kitsune
+01 Mirrorshell Crab
+01 Spell Pierce
+01 Unstoppable Ogre
+01 Thornwood Falls
+01 Moon-Circuit Hacker
+01 Spell Pierce
+01 Favor of Jukai
+01 Mothrider Patrol
+01 Rugged Highlands
+01 Scoured Barrens
+01 Kitsune Ace
 

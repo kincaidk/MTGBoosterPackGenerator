@@ -13,19 +13,23 @@ const PATH = require('path');
 / --ARGUMENTS--
 / The set code is passed in as command line argument 0.
 / [optional] The number of boosters to generate is passed in as command line argument 1.
-/ [optional] The prefix of the file path to the full set is passed in as command line argument 2.
+/ [optional] Whether to include basic lands in the boosters. (defaulted to false.)
+/ [optional] The prefix of the file path to the full set is passed in as command line argument 3.
 */////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Create an array to hold all the command line arguments.
 const ARGUMENTS = [];
-ARGUMENTS.push(process.argv[2]); // NOTE: In JS, argv[2] is the first command line argument that's passed in.
-ARGUMENTS.push(process.argv[3]);
-ARGUMENTS.push(process.argv[4]);
+
+// NOTE: In JS, process.argv[2] is the first command line argument that's passed in.
+for (let i = 2; i < process.argv.length; i++) {
+    ARGUMENTS.push(process.argv[i]);
+}
 
 // Process the command line arguments.
 const SET_CODE = ARGUMENTS[0].toUpperCase(); // For example: "SNC" for Streets of New Capenna.
 const NUMBER_OF_BOOSTERS = (!ARGUMENTS[1] || parseInt(ARGUMENTS[1]) < 1) ? 1 : parseInt(ARGUMENTS[1]);
-const FULL_SET_FILE_PATH_PREFIX = (!ARGUMENTS[2]) ? "" : ARGUMENTS[2];
+const INCLUDE_BASIC_LANDS = (!ARGUMENTS[2]) ? false : ARGUMENTS[2].toLowerCase() !== "false";
+const FULL_SET_FILE_PATH_PREFIX = (!ARGUMENTS[3]) ? "" : ARGUMENTS[3];
 
 // Define other variables.
 const SET_FILES_FOLDER_NAME = "SetFiles";
@@ -43,8 +47,17 @@ const RARE_COUNT = 1;
 function sample(arrayToSample) {
     if (arrayToSample.length === 0) {return undefined;}
 
-    const RANDOM_INDEX = Math.floor(Math.random() * arrayToSample.length);
-    return arrayToSample[RANDOM_INDEX];
+    const BASIC_LANDS = ["plains","island","swamp","mountain","forest"];
+    let cardIsBasicLand;
+    let cardName;
+
+    do {
+        let randomIndex = Math.floor(Math.random() * arrayToSample.length);
+        cardName = arrayToSample[randomIndex]
+        cardIsBasicLand = BASIC_LANDS.indexOf(cardName.toLowerCase()) != -1;
+    } while (!INCLUDE_BASIC_LANDS && cardIsBasicLand)
+
+    return cardName;
 }
 
 // Read the contents of the file to get every card in the set. Assign to stringifiedCardHash.
@@ -149,8 +162,6 @@ for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
     });
 }
 
-
-// testing
 console.log(`BOOSTER GENERATION COMPLETE! - ${FILE_NAME_BOOSTER}`);
 
 

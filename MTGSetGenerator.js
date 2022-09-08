@@ -74,7 +74,6 @@ async function main() {
                 }
             }
 
-            // testing - Lists the number of cards on the current page.
             console.log(`NUMBER OF CARDS ON PAGE ${_page}: ${numberOfCardsOnPage}`);
         })
 
@@ -91,7 +90,7 @@ async function main() {
     // Adjust the total card count to ignore duplicates.
     totalNumberOfCardsFound -= duplicatesFound;
 
-    // testing - Lists the total number of cards and duplicates found.
+    // Log the total number of cards and duplicates found.
     console.log(`\nTOTAL NUMBER OF DUPLICATE CARDS FOUND: ${duplicatesFound}`);
     console.log(`\nTOTAL NUMBER OF UNIQUE CARDS FOUND: ${totalNumberOfCardsFound}`);
 
