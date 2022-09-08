@@ -1,0 +1,22 @@
+{
+  "name": "mtgboosterpackgenerator",
+  "version": "1.0.0",
+  "description": "Generate booster packs for Magic: The Gathering.",
+  "main": "MTGBoosterGenerator.js",
+  "scripts": {
+    "test": "node MTGSetGenerator.js NEO && node MTGBoosterGenerator.js NEO 6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kincaidk/MTGBoosterPackGenerator.git"
+  },
+  "author": "Kellen Kincaid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kincaidk/MTGBoosterPackGenerator/issues"
+  },
+  "homepage": "https://github.com/kincaidk/MTGBoosterPackGenerator#readme",
+  "dependencies": {
+    "mtgsdk": "^1.0.0"
+  }
+}
