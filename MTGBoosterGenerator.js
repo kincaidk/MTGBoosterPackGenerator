@@ -44,6 +44,12 @@ const COMMON_COUNT = 11;
 const UNCOMMON_COUNT = 3;
 const RARE_COUNT = 1;
 
+// Create BoosterFiles directory, if it doesn't exist.
+if (!FS.existsSync(BOOSTER_FILES_FOLDER_NAME)) {
+    FS.mkdirSync(BOOSTER_FILES_FOLDER_NAME);
+}
+
+// Function for getting a random entry from an array.
 function sample(arrayToSample) {
     if (arrayToSample.length === 0) {return undefined;}
 

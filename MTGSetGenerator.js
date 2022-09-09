@@ -97,6 +97,11 @@ async function main() {
     // Stringify that 'cards' dictionary.
     const STRINGIFIED_CARDS_JSON = JSON.stringify(CARDS);
 
+    // Create SetFiles directory, if it doesn't exist.
+    if (!FS.existsSync(SET_FILES_FOLDER_NAME)) {
+        FS.mkdirSync(SET_FILES_FOLDER_NAME);
+    }
+
     // Write the stringified 'cards' dictionary to a file.
     const FILE_PATH = PATH.join(SET_FILES_FOLDER_NAME, `${SET_CODE}_cards.txt`);
     FS.writeFile(FILE_PATH, STRINGIFIED_CARDS_JSON, err => {
