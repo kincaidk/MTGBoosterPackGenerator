@@ -12,6 +12,60 @@ const PATH = require('path');
 / The set code is passed in as command line argument 0.
 */////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+// This function will be used to extract the all the cards from the designated set.
+async function getCardsOnPage(_page, _pageSize, _setCode) {
+    let numberOfCardsOnPage = 0;
+
+    await MTG.card.where({ set: _setCode, pageSize: _pageSize, page: _page })
+    .then(cardsOnPage => {
+        numberOfCardsOnPage = cardsOnPage.length
+
+        // console.log(cardsOnPage[0]) //testing (use this to see all the properties of a Card object.)
+
+        // Populate the 'cards' dictionary with each card, based on their rarities.
+        for (let i = 0; i < numberOfCardsOnPage; i++) {
+            const CARD = cardsOnPage[i];
+            
+            console.log(`${CARD.name} - ${CARD.rarity}`);
+
+            const RARITY = CARD.rarity.toLowerCase();
+            const CARD_NAME = CARD.name;
+            switch (RARITY) {
+                case "common":
+                    if (CARDS["commons"].indexOf(CARD_NAME) == -1) {
+                        CARDS["commons"].push(CARD_NAME);
+                    } else {duplicatesFound++;}
+                    break;
+                case "uncommon":
+                    if (CARDS["uncommons"].indexOf(CARD_NAME) == -1) {
+                        CARDS["uncommons"].push(CARD_NAME);
+                    } else {duplicatesFound++;}
+                    break;
+                case "rare":
+                    if (CARDS["rares"].indexOf(CARD_NAME) == -1) {
+                        CARDS["rares"].push(CARD_NAME);
+                    } else {duplicatesFound++;}
+                    break;
+                case "mythic":
+                case "mythic rare":
+                    if (CARDS["mythicRares"].indexOf(CARD_NAME) == -1) {
+                        CARDS["mythicRares"].push(CARD_NAME);
+                    } else {duplicatesFound++;}
+                    break;
+                default:
+                    console.log(`!!! RARITY NOT RECOGNIZED - ${RARITY}`);
+                    break;
+            }
+        }
+
+        console.log(`NUMBER OF CARDS ON PAGE ${_page}: ${numberOfCardsOnPage}`);
+    })
+
+    return numberOfCardsOnPage;
+}
+
+
 async function main() {    
     // Create an array to hold all the command line arguments.
     const ARGUMENTS = [];
@@ -28,57 +82,6 @@ async function main() {
     let numberOfCardsOnPage = 0;
     let totalNumberOfCardsFound = 0;
     let duplicatesFound = 0;
-
-    
-    // This function will be used to extract the all the cards from the designated set.
-    async function getCardsOnPage(_page, _pageSize, _setCode) {
-        let numberOfCardsOnPage = 0;
-
-        await MTG.card.where({ set: _setCode, pageSize: _pageSize, page: _page })
-        .then(cardsOnPage => {
-            numberOfCardsOnPage = cardsOnPage.length
-
-            // console.log(cardsOnPage[0]) //testing (use this to see all the properties of a Card object.)
-
-            // Populate the 'cards' dictionary with each card, based on their rarities.
-            for (let i = 0; i < numberOfCardsOnPage; i++) {
-                console.log(`${cardsOnPage[i].name} - ${cardsOnPage[i].rarity}`);
-
-                const RARITY = cardsOnPage[i].rarity.toLowerCase();
-                const CARD_NAME = cardsOnPage[i].name;
-                switch (RARITY) {
-                    case "common":
-                        if (CARDS["commons"].indexOf(CARD_NAME) == -1) {
-                            CARDS["commons"].push(CARD_NAME);
-                        } else {duplicatesFound++;}
-                        break;
-                    case "uncommon":
-                        if (CARDS["uncommons"].indexOf(CARD_NAME) == -1) {
-                            CARDS["uncommons"].push(CARD_NAME);
-                        } else {duplicatesFound++;}
-                        break;
-                    case "rare":
-                        if (CARDS["rares"].indexOf(CARD_NAME) == -1) {
-                            CARDS["rares"].push(CARD_NAME);
-                        } else {duplicatesFound++;}
-                        break;
-                    case "mythic":
-                    case "mythic rare":
-                        if (CARDS["mythicRares"].indexOf(CARD_NAME) == -1) {
-                            CARDS["mythicRares"].push(CARD_NAME);
-                        } else {duplicatesFound++;}
-                        break;
-                    default:
-                        console.log(`!!! RARITY NOT RECOGNIZED - ${RARITY}`);
-                        break;
-                }
-            }
-
-            console.log(`NUMBER OF CARDS ON PAGE ${_page}: ${numberOfCardsOnPage}`);
-        })
-
-        return numberOfCardsOnPage;
-    }
 
     // NOTE: We can only get 100 cards at a time. This loop gets all the cards in batches of 100 (or whatever the pageSize variable has been set to.)
     do {

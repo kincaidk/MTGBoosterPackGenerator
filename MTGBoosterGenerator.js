@@ -1,3 +1,4 @@
+const MTG = require('mtgsdk');
 const FS = require('fs');
 const PATH = require('path');
 
@@ -14,7 +15,8 @@ const PATH = require('path');
 / The set code is passed in as command line argument 0.
 / [optional] The number of boosters to generate is passed in as command line argument 1. (defaults to 1)
 / [optional] Whether to include basic lands in the boosters. (defaulted to false)
-/ [optional] The prefix of the file path to the full set is passed in as command line argument 3. (defaults to "")
+/ [optional] Whether to create a file containing the contents of the boosters sorted. (defaults to false)
+/ [optional] The prefix of the file path to the full set is passed in as command line argument 4. (defaults to "")
 */////////////////////////////////////////////////////////////////////////////////////////////////
 
 //#region Variables
@@ -30,19 +32,33 @@ for (let i = 2; i < process.argv.length; i++) {
 const SET_CODE = ARGUMENTS[0].toUpperCase(); // For example: "SNC" for Streets of New Capenna.
 const NUMBER_OF_BOOSTERS = (!ARGUMENTS[1] || parseInt(ARGUMENTS[1]) < 1) ? 1 : parseInt(ARGUMENTS[1]);
 const INCLUDE_BASIC_LANDS = (!ARGUMENTS[2]) ? false : ARGUMENTS[2].toLowerCase() !== "false";
-const FULL_SET_FILE_PATH_PREFIX = (!ARGUMENTS[3]) ? "" : ARGUMENTS[3];
+const SORT_CARDS = (!ARGUMENTS[3]) ? false : ARGUMENTS[3].toLowerCase() !== "false";
+const FULL_SET_FILE_PATH_PREFIX = (!ARGUMENTS[4]) ? "" : ARGUMENTS[4];
 
 // Define other variables.
 const SET_FILES_FOLDER_NAME = "SetFiles";
 const BOOSTER_FILES_FOLDER_NAME = "BoosterFiles";
 const FILE_NAME_FULL_SET = PATH.join(FULL_SET_FILE_PATH_PREFIX, SET_FILES_FOLDER_NAME, `${SET_CODE}_cards.txt`);
 const FILE_NAME_BOOSTER = PATH.join(BOOSTER_FILES_FOLDER_NAME, `${SET_CODE}_booster.txt`);
+const FILE_NAME_BOOSTER_SORTED = PATH.join(BOOSTER_FILES_FOLDER_NAME, `${SET_CODE}_booster_SORTED.txt`);
 let cardHash = null;
 
 // These constants represent the distribution of cards in a booster pack, by rarity.
 const COMMON_COUNT = 11;
 const UNCOMMON_COUNT = 3;
 const RARE_COUNT = 1;
+
+// Used for sorting the cards that get chosen for booster packs. (only relevant if the SORT_CARDS argument is true)
+const SORTED_CARDS = {
+    lands:[],
+    multicolored:{creatures:[], nonCreatures:[]},
+    white:{creatures:[], nonCreatures:[]},
+    blue:{creatures:[], nonCreatures:[]},
+    black:{creatures:[], nonCreatures:[]},
+    red:{creatures:[], nonCreatures:[]},
+    green:{creatures:[], nonCreatures:[]},
+    colorless:{creatures:[], nonCreatures:[]}
+};
 //#endregion
 
 //#region Functions
@@ -73,7 +89,7 @@ function prepareBoosterFile() {
         FS.mkdirSync(BOOSTER_FILES_FOLDER_NAME);
     }
 
-    // Clear the contents of the booster file. (If it doesn't exist, this will create it and make it blank.)
+    // Clear the contents of the booster file, or create it if it doesn't exist.
     FS.writeFileSync(FILE_NAME_BOOSTER, "", function(err) {
         if (err) {
             throw(`!!! ERROR CLEARING BOOSTER FILE - ${FILE_NAME_BOOSTER}\nERROR MESSAGE: ${err}`);
@@ -109,7 +125,7 @@ function parseCardHash() {
 
     Returns the number of missing cards for this rarity.
 */
-function selectRareCard(missingCardCount) {
+async function selectRareCard(missingCardCount) {
     for (let r = 0; r < RARE_COUNT; r++) {
         // 12.5% chance for the Rare card in a booster pack to be a Mythic Rare card instead.
         const GET_MYTHIC_RARE_CARD = Math.floor(Math.random() * 8) < 1;
@@ -140,6 +156,11 @@ function selectRareCard(missingCardCount) {
                 throw(`!!! ERROR APPENDING TO BOOSTER FILE - ${FILE_NAME_BOOSTER}\nERROR MESSAGE: ${err}`);
             }
         });
+
+        // Sort the card into SORTED_CARDS if necessary.
+        if (SORT_CARDS) {
+            await getCardFromCardNameAndSortIt(cardName);
+        }
     }
 
     return missingCardCount;
@@ -153,7 +174,7 @@ function selectRareCard(missingCardCount) {
 
     Returns the number of missing cards for this rarity.
 */
-function selectUncommonCard(missingCardCount) {
+async function selectUncommonCard(missingCardCount) {
     for (let u = 0; u < (UNCOMMON_COUNT + missingCardCount); u++) {
         let cardName = sample(cardHash["uncommons"]);
 
@@ -172,6 +193,11 @@ function selectUncommonCard(missingCardCount) {
                 throw(`!!! ERROR APPENDING TO BOOSTER FILE - ${FILE_NAME_BOOSTER}\nERROR MESSAGE: ${err}`);
             }
         });
+
+        // Sort the card into SORTED_CARDS if necessary.
+        if (SORT_CARDS) {
+            await getCardFromCardNameAndSortIt(cardName);
+        }
     }
 
     return missingCardCount;
@@ -183,7 +209,7 @@ function selectUncommonCard(missingCardCount) {
     PARAMS:
     -Takes a variable that will represent the number of missing cards (based on missing rarities)
 */
-function selectCommonCard(missingCardCount) {
+async function selectCommonCard(missingCardCount) {
     for (let c = 0; c < (COMMON_COUNT + missingCardCount); c++) {
         let cardName = sample(cardHash["commons"]);
 
@@ -199,23 +225,28 @@ function selectCommonCard(missingCardCount) {
                 throw(`!!! ERROR APPENDING TO BOOSTER FILE - ${FILE_NAME_BOOSTER}\nERROR MESSAGE: ${err}`);
             }
         });
+
+        // Sort the card into SORTED_CARDS if necessary.
+        if (SORT_CARDS) {
+            await getCardFromCardNameAndSortIt(cardName);
+        }
     }
 }
 
 /*
     Generates a 15-card booster pack and appends it to the corresponding booster file.
 */
-function generateBoosterPack() {
+async function generateBoosterPack() {
     let missingCardCount = 0;
 
     // Rares
-    missingCardCount = selectRareCard(missingCardCount);
+    missingCardCount = await selectRareCard(missingCardCount);
 
     // Uncommons
-    missingCardCount = selectUncommonCard(missingCardCount);
+    missingCardCount = await selectUncommonCard(missingCardCount);
 
     // Commons
-    selectCommonCard(missingCardCount);
+    await selectCommonCard(missingCardCount);
 
     // Append a new line character to the booster file as a separator for each booster.
     FS.appendFileSync(FILE_NAME_BOOSTER, "\n", function(err) {
@@ -224,6 +255,228 @@ function generateBoosterPack() {
         }
     });
 }
+
+/*
+    Returns true if card has the designated type.
+*/
+async function cardHasType(card, type) {
+    return card.types.indexOf(type) !== -1;
+}
+
+/*
+    Adds the card's name to the SORTED_CARDS hash.
+*/
+async function addCardToSortedCardHash(card) {
+    const CARD_NAME = card.name;
+    const CARD_IS_LAND = await cardHasType(card, "Land");
+    
+    //testing
+    console.log(`CARD_IS_LAND: ${CARD_IS_LAND}`);
+
+    if (CARD_IS_LAND) {
+        SORTED_CARDS.lands.push(CARD_NAME);
+    } else {
+        const CARD_IS_CREATURE = await cardHasType(card, "Creature");
+        const CARD_IS_MULTICOLORED = (!card.colorIdentity) ? false : card.colorIdentity.length > 2;
+
+        if (CARD_IS_MULTICOLORED) {
+            // Multicolored cards.
+            if (CARD_IS_CREATURE) {
+                SORTED_CARDS.multicolored.creatures.push(CARD_NAME);
+            } else {
+                SORTED_CARDS.multicolored.nonCreatures.push(CARD_NAME);
+            }
+        } else {
+            // Non-multicolored cards.
+            const CARD_COLOR = (!card.colorIdentity) ? "" : card.colorIdentity[0].toLowerCase();
+            switch (CARD_COLOR) {
+                case "w":
+                    if (CARD_IS_CREATURE) {
+                        SORTED_CARDS.white.creatures.push(CARD_NAME);
+                    } else {
+                        SORTED_CARDS.white.nonCreatures.push(CARD_NAME);
+                    }
+                    break;
+                case "u":
+                    if (CARD_IS_CREATURE) {
+                        SORTED_CARDS.blue.creatures.push(CARD_NAME);
+                    } else {
+                        SORTED_CARDS.blue.nonCreatures.push(CARD_NAME);
+                    }
+                    break;
+                case "b":
+                    if (CARD_IS_CREATURE) {
+                        SORTED_CARDS.black.creatures.push(CARD_NAME);
+                    } else {
+                        SORTED_CARDS.black.nonCreatures.push(CARD_NAME);
+                    }
+                    break;
+                case "r":
+                    if (CARD_IS_CREATURE) {
+                        SORTED_CARDS.red.creatures.push(CARD_NAME);
+                    } else {
+                        SORTED_CARDS.red.nonCreatures.push(CARD_NAME);
+                    }
+                    break;
+                case "g":
+                    if (CARD_IS_CREATURE) {
+                        SORTED_CARDS.green.creatures.push(CARD_NAME);
+                    } else {
+                        SORTED_CARDS.green.nonCreatures.push(CARD_NAME);
+                    }
+                    break;
+                default:
+                    if (CARD_IS_CREATURE) {
+                        SORTED_CARDS.colorless.creatures.push(CARD_NAME);
+                    } else {
+                        SORTED_CARDS.colorless.nonCreatures.push(CARD_NAME);
+                    }
+            }
+        }
+    }
+}
+
+/*
+    Takes a card's name and queries the corresponding card object.
+    Then adds that card's name to the SORTED_CARDS hash based on some of the card's attributes.
+*/
+async function getCardFromCardNameAndSortIt(_cardName) {
+    // Get the card object with this card's name and add it to SORTED_CARDS.
+    await MTG.card.where({ set: SET_CODE, name: _cardName })
+    .then(async cardsOnPage => {
+        const CARD = (!cardsOnPage || cardsOnPage.length === 0) ? "" : cardsOnPage[0];
+
+        if (CARD === "") {
+            throw(`!!! ERROR QUERYING CARD WITH NAME - ${_cardName}\n`);
+        } else {
+            await addCardToSortedCardHash(CARD);
+        }
+    });
+}
+
+/*
+    Main function.
+*/
+async function main() {
+    prepareBoosterFile();
+    cardHash = parseCardHash();
+
+    // Generate each card for the booster and write their names to the booster file.
+    for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
+        await generateBoosterPack();
+    }
+
+    // If the cards were also sorted, create a separate file and store the sorted cards in there.
+    if (SORT_CARDS) {
+        const CARD_PREFIX = "01 ";
+        let concatenatedCards = "";
+        let cardArray = [];
+
+        // Add lands
+        cardArray = SORTED_CARDS.lands;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+        // Add multicolored
+        cardArray = SORTED_CARDS.multicolored.nonCreatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+        cardArray = SORTED_CARDS.multicolored.creatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+        // Add white
+        cardArray = SORTED_CARDS.white.nonCreatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+        cardArray = SORTED_CARDS.white.creatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+        // Add blue
+        cardArray = SORTED_CARDS.blue.nonCreatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+        cardArray = SORTED_CARDS.blue.creatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+        // Add black
+        cardArray = SORTED_CARDS.black.nonCreatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+        cardArray = SORTED_CARDS.black.creatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+        // Add red
+        cardArray = SORTED_CARDS.red.nonCreatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+        cardArray = SORTED_CARDS.red.creatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+        // Add green
+        cardArray = SORTED_CARDS.green.nonCreatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+        cardArray = SORTED_CARDS.green.creatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+        // Add colorless
+        cardArray = SORTED_CARDS.colorless.nonCreatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+        cardArray = SORTED_CARDS.colorless.creatures;
+        if (cardArray.length > 0) {
+            concatenatedCards += `${CARD_PREFIX}${cardArray.join(`\n${CARD_PREFIX}`)}`;
+            concatenatedCards += "\n\n";
+        }
+
+
+        FS.writeFileSync(FILE_NAME_BOOSTER_SORTED, concatenatedCards, function(err) {
+            if (err) {
+                throw(`!!! ERROR APPENDING TO SORTED BOOSTER FILE - ${FILE_NAME_BOOSTER_SORTED}\nERROR MESSAGE: ${err}`);
+            }
+        });
+    }
+
+    console.log(`SUCCESSFULLY GENERATED ${NUMBER_OF_BOOSTERS} BOOSTERS! --- FIND THEM HERE: ${FILE_NAME_BOOSTER}`);
+
+    if (SORT_CARDS) {
+        console.log(`FIND THEM SORTED HERE: ${FILE_NAME_BOOSTER_SORTED}`);
+    }
+}
 //#endregion
 
 //////////////////////////////////////
@@ -231,16 +484,26 @@ function generateBoosterPack() {
                 //////// MAIN ////////
                 ////////      ////////
 //////////////////////////////////////
+main();
 
-prepareBoosterFile();
-cardHash = parseCardHash();
 
-// Generate each card for the booster and write their names to the booster file.
-for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
-    generateBoosterPack();
+//testing - delete everything beyond this point.
+async function test() {
+    await MTG.card.where({ set: SET_CODE, pageSize: 100, page: 3,  })
+    .then(async cardsOnPage => {
+        for (let i = 0; i < cardsOnPage.length; i++) {
+            const CARD = cardsOnPage[i];
+            
+            //testing
+            console.log(`${CARD.name} --- ${CARD.colorIdentity} --- ${CARD.types}`);
+
+            await addCardToSortedCardHash(CARD);
+        }
+    });
+
+    //testing
+    console.log("\nSORTED CARDS\n");
+    console.log(SORTED_CARDS);
 }
 
-console.log(`SUCCESSFULLY GENERATED ${NUMBER_OF_BOOSTERS} BOOSTERS! --- FIND THEM HERE: ${FILE_NAME_BOOSTER}`);
-
-
-
+// test();
