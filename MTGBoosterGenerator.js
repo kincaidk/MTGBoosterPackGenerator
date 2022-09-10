@@ -277,9 +277,12 @@ async function addCardToSortedCardHash(card) {
         SORTED_CARDS.lands.push(CARD_NAME);
     } else {
         const CARD_IS_CREATURE = await cardHasType(card, "Creature");
-        const CARD_IS_MULTICOLORED = (!card.colorIdentity) ? false : card.colorIdentity.length > 2;
+        const CARD_IS_MULTICOLORED = (!card.colors) ? false : card.colors.length > 1;
 
         if (CARD_IS_MULTICOLORED) {
+            //testing
+            console.log(`CARD IS MULTICOLORED - ${CARD_NAME} - ColorID:${card.colorIdentity} - Colors:${card.colors} - CMC:${card.cmc} - ManaCost:${card.manaCost}`);
+
             // Multicolored cards.
             if (CARD_IS_CREATURE) {
                 SORTED_CARDS.multicolored.creatures.push(CARD_NAME);
@@ -288,37 +291,37 @@ async function addCardToSortedCardHash(card) {
             }
         } else {
             // Non-multicolored cards.
-            const CARD_COLOR = (!card.colorIdentity) ? "" : card.colorIdentity[0].toLowerCase();
-            switch (CARD_COLOR) {
-                case "w":
+            const CARD_COLOR = (!card.colors) ? "" : card.colors[0].toLowerCase();
+            switch (CARD_COLOR.toLowerCase()) {
+                case "white":
                     if (CARD_IS_CREATURE) {
                         SORTED_CARDS.white.creatures.push(CARD_NAME);
                     } else {
                         SORTED_CARDS.white.nonCreatures.push(CARD_NAME);
                     }
                     break;
-                case "u":
+                case "blue":
                     if (CARD_IS_CREATURE) {
                         SORTED_CARDS.blue.creatures.push(CARD_NAME);
                     } else {
                         SORTED_CARDS.blue.nonCreatures.push(CARD_NAME);
                     }
                     break;
-                case "b":
+                case "black":
                     if (CARD_IS_CREATURE) {
                         SORTED_CARDS.black.creatures.push(CARD_NAME);
                     } else {
                         SORTED_CARDS.black.nonCreatures.push(CARD_NAME);
                     }
                     break;
-                case "r":
+                case "red":
                     if (CARD_IS_CREATURE) {
                         SORTED_CARDS.red.creatures.push(CARD_NAME);
                     } else {
                         SORTED_CARDS.red.nonCreatures.push(CARD_NAME);
                     }
                     break;
-                case "g":
+                case "green":
                     if (CARD_IS_CREATURE) {
                         SORTED_CARDS.green.creatures.push(CARD_NAME);
                     } else {
@@ -326,6 +329,9 @@ async function addCardToSortedCardHash(card) {
                     }
                     break;
                 default:
+                    //testing
+                    console.log(`CARD IS COLORLESS - ${CARD_NAME} - ColorID:${card.colorIdentity} - Colors:${card.colors} - CMC:${card.cmc} - ManaCost:${card.manaCost}`);
+
                     if (CARD_IS_CREATURE) {
                         SORTED_CARDS.colorless.creatures.push(CARD_NAME);
                     } else {
