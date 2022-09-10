@@ -12,11 +12,12 @@ const PATH = require('path');
 / 
 / --ARGUMENTS--
 / The set code is passed in as command line argument 0.
-/ [optional] The number of boosters to generate is passed in as command line argument 1.
-/ [optional] Whether to include basic lands in the boosters. (defaulted to false.)
-/ [optional] The prefix of the file path to the full set is passed in as command line argument 3.
+/ [optional] The number of boosters to generate is passed in as command line argument 1. (defaults to 1)
+/ [optional] Whether to include basic lands in the boosters. (defaulted to false)
+/ [optional] The prefix of the file path to the full set is passed in as command line argument 3. (defaults to "")
 */////////////////////////////////////////////////////////////////////////////////////////////////
 
+//#region Variables
 // Create an array to hold all the command line arguments.
 const ARGUMENTS = [];
 
@@ -42,7 +43,9 @@ let cardHash = null;
 const COMMON_COUNT = 11;
 const UNCOMMON_COUNT = 3;
 const RARE_COUNT = 1;
+//#endregion
 
+//#region Functions
 // Function for getting a random entry from an array. 
 function sample(arrayToSample) {
     if (arrayToSample.length === 0) {return undefined;}
@@ -221,6 +224,7 @@ function generateBoosterPack() {
         }
     });
 }
+//#endregion
 
 //////////////////////////////////////
                 ////////      ////////
