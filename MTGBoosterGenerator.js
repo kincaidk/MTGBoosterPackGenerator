@@ -36,7 +36,6 @@ const SET_FILES_FOLDER_NAME = "SetFiles";
 const BOOSTER_FILES_FOLDER_NAME = "BoosterFiles";
 const FILE_NAME_FULL_SET = PATH.join(FULL_SET_FILE_PATH_PREFIX, SET_FILES_FOLDER_NAME, `${SET_CODE}_cards.txt`);
 const FILE_NAME_BOOSTER = PATH.join(BOOSTER_FILES_FOLDER_NAME, `${SET_CODE}_booster.txt`);
-let stringifiedCardHash = null;
 let cardHash = null;
 
 // These constants represent the distribution of cards in a booster pack, by rarity.
@@ -44,12 +43,7 @@ const COMMON_COUNT = 11;
 const UNCOMMON_COUNT = 3;
 const RARE_COUNT = 1;
 
-// Create BoosterFiles directory, if it doesn't exist.
-if (!FS.existsSync(BOOSTER_FILES_FOLDER_NAME)) {
-    FS.mkdirSync(BOOSTER_FILES_FOLDER_NAME);
-}
-
-// Function for getting a random entry from an array.
+// Function for getting a random entry from an array. 
 function sample(arrayToSample) {
     if (arrayToSample.length === 0) {return undefined;}
 
@@ -66,30 +60,53 @@ function sample(arrayToSample) {
     return cardName;
 }
 
-// Read the contents of the file to get every card in the set. Assign to stringifiedCardHash.
-if (FS.existsSync(FILE_NAME_FULL_SET)) {
-    stringifiedCardHash = FS.readFileSync(FILE_NAME_FULL_SET, {encoding: "utf8", flag: "r"});
-    cardHash = JSON.parse(stringifiedCardHash);
-
-    if (typeof(cardHash) !== "object") {
-        throw(`CARD HASH WAS NOT A HASH -- ${typeof(cardHash)}`);
+/*
+    Creates the file that booster packs will reside.
+    Also creates the BoosterFiles directory, if it doesn't exist.
+*/
+function prepareBoosterFile() {
+    // Create BoosterFiles directory, if it doesn't exist.
+    if (!FS.existsSync(BOOSTER_FILES_FOLDER_NAME)) {
+        FS.mkdirSync(BOOSTER_FILES_FOLDER_NAME);
     }
-} else {
-   throw(`FILE DID NOT EXIST -- ${FILE_NAME_FULL_SET}`);
+
+    // Clear the contents of the booster file. (If it doesn't exist, this will create it and make it blank.)
+    FS.writeFileSync(FILE_NAME_BOOSTER, "", function(err) {
+        if (err) {
+            throw(`!!! ERROR CLEARING BOOSTER FILE - ${FILE_NAME_BOOSTER}\nERROR MESSAGE: ${err}`);
+        }
+    });
 }
 
-// Clear the contents of the booster file. (If it doesn't exist, this will create it and make it blank.)
-FS.writeFileSync(FILE_NAME_BOOSTER, "", function(err) {
-    if (err) {
-        throw(`!!! ERROR CLEARING BOOSTER FILE - ${FILE_NAME_BOOSTER}\nERROR MESSAGE: ${err}`);
+/*
+    Reads the file that contains all the card in the designated set.
+    Returns json that contains each card in the designatd set, organized by rarity.
+*/
+function parseCardHash() {
+    // Read and parse the contents of the file to get every card in the set.
+    if (FS.existsSync(FILE_NAME_FULL_SET)) {
+        const STRINGIFIED_CARD_HASH = FS.readFileSync(FILE_NAME_FULL_SET, {encoding: "utf8", flag: "r"});
+        const PARSED_CARD_HASH = JSON.parse(STRINGIFIED_CARD_HASH);
+
+        if (typeof(PARSED_CARD_HASH) !== "object") {
+            throw(`!!! CARD HASH WAS NOT A HASH -- ${typeof(PARSED_CARD_HASH)}`);
+        }
+
+        return PARSED_CARD_HASH;
+    } else {
+        throw(`!!! FILE DID NOT EXIST -- ${FILE_NAME_FULL_SET}`);
     }
-});
+}
 
-// Generate each card for the booster and write their names to the booster file.
-for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
-    let missingCardCount = 0;
+/*
+    Adds a rare (or mythic rare) card to the booster pack.
+    
+    PARAMS:
+    -Takes a variable that will represent the number of missing cards (based on missing rarities)
 
-    // Rares
+    Returns the number of missing cards for this rarity.
+*/
+function selectRareCard(missingCardCount) {
     for (let r = 0; r < RARE_COUNT; r++) {
         // 12.5% chance for the Rare card in a booster pack to be a Mythic Rare card instead.
         const GET_MYTHIC_RARE_CARD = Math.floor(Math.random() * 8) < 1;
@@ -100,15 +117,15 @@ for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
         // If there are no cards of either rarity, then break out the loop.
         if (!cardName) {
             if (GET_MYTHIC_RARE_CARD) {
-                console.log("NO MYTHIC RARES TO CHOOSE FROM.");
+                console.log("! WARNING - NO MYTHIC RARES TO CHOOSE FROM.");
                 cardName = sample(cardHash["rares"]);
             } else {
-                console.log("NO RARES TO CHOOSE FROM.")
+                console.log("! WARNING - NO RARES TO CHOOSE FROM.")
                 cardName = sample(cardHash["mythicRares"]);
             }
 
             if (!cardName) {
-                console.log("NO RARES OR MYTHIC RARES TO CHOOSE FROM.");
+                console.log("! WARNING - NO RARES OR MYTHIC RARES TO CHOOSE FROM.");
                 missingCardCount = RARE_COUNT;
                 break;
             }
@@ -122,12 +139,24 @@ for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
         });
     }
 
-    // Uncommons
+    return missingCardCount;
+}
+
+/*
+    Adds an uncommon card to the booster pack.
+    
+    PARAMS:
+    -Takes a variable that will represent the number of missing cards (based on missing rarities)
+
+    Returns the number of missing cards for this rarity.
+*/
+function selectUncommonCard(missingCardCount) {
     for (let u = 0; u < (UNCOMMON_COUNT + missingCardCount); u++) {
         let cardName = sample(cardHash["uncommons"]);
 
         // Break if there are no cards of this rarity.
         if (!cardName) {
+            console.log("! WARNING - NO UNCOMMONS FOUND!");
             missingCardCount += UNCOMMON_COUNT;
             break;
         } else if (missingCardCount !== 0) {
@@ -142,7 +171,16 @@ for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
         });
     }
 
-    // Commons
+    return missingCardCount;
+}
+
+/*
+    Adds a common card to the booster pack.
+    
+    PARAMS:
+    -Takes a variable that will represent the number of missing cards (based on missing rarities)
+*/
+function selectCommonCard(missingCardCount) {
     for (let c = 0; c < (COMMON_COUNT + missingCardCount); c++) {
         let cardName = sample(cardHash["commons"]);
 
@@ -159,6 +197,22 @@ for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
             }
         });
     }
+}
+
+/*
+    Generates a 15-card booster pack and appends it to the corresponding booster file.
+*/
+function generateBoosterPack() {
+    let missingCardCount = 0;
+
+    // Rares
+    missingCardCount = selectRareCard(missingCardCount);
+
+    // Uncommons
+    missingCardCount = selectUncommonCard(missingCardCount);
+
+    // Commons
+    selectCommonCard(missingCardCount);
 
     // Append a new line character to the booster file as a separator for each booster.
     FS.appendFileSync(FILE_NAME_BOOSTER, "\n", function(err) {
@@ -168,7 +222,21 @@ for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
     });
 }
 
-console.log(`BOOSTER GENERATION COMPLETE! - ${FILE_NAME_BOOSTER}`);
+//////////////////////////////////////
+                ////////      ////////
+                //////// MAIN ////////
+                ////////      ////////
+//////////////////////////////////////
+
+prepareBoosterFile();
+cardHash = parseCardHash();
+
+// Generate each card for the booster and write their names to the booster file.
+for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
+    generateBoosterPack();
+}
+
+console.log(`SUCCESSFULLY GENERATED ${NUMBER_OF_BOOSTERS} BOOSTERS! --- FIND THEM HERE: ${FILE_NAME_BOOSTER}`);
 
 
 
