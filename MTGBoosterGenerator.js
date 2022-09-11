@@ -389,7 +389,12 @@ async function getCardsFromCardNamesAndSortThem(cardNames) {
 async function main() {
     prepareBoosterFile();
     cardHash = parseCardHash();
-    maxCardNumber = cardHash.setSize;
+
+    try {
+        maxCardNumber = cardHash.setSize;
+    } catch (e) {
+        throw "!!! ERROR referencing the setSize property of the card hash. Try fetching the set's cards again [node MTGSetGenerator.js <setCode>]";
+    }
 
     // Generate each card for the booster and write their names to the booster file.
     for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
