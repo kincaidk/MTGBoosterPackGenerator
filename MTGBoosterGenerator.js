@@ -12,11 +12,11 @@ const PATH = require('path');
 /   1 rare / mythic rare
 / 
 / --ARGUMENTS--
-/ The set code is passed in as command line argument 0.
-/ [optional] The number of boosters to generate is passed in as command line argument 1. (defaults to 1)
-/ [optional] Whether to include basic lands in the boosters. (defaulted to false)
-/ [optional] Whether to create a file containing the contents of the boosters sorted. (defaults to false)
-/ [optional] The prefix of the file path to the full set is passed in as command line argument 4. (defaults to "")
+/ The set code (argument 0).
+/ [optional] The number of boosters to generate (argument 1). (defaults to 1)
+/ [optional] Whether to include basic lands in the boosters (argument 2). (defaulted to false)
+/ [optional] Whether to create a file containing the contents of the boosters sorted (argument 3). (defaults to false)
+/ [optional] The prefix of the file path to the full set (argument 4). (defaults to "")
 */////////////////////////////////////////////////////////////////////////////////////////////////
 
 //#region Variables
