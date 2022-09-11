@@ -47,6 +47,8 @@ let cardHash = null;
 const COMMON_COUNT = 11;
 const UNCOMMON_COUNT = 3;
 const RARE_COUNT = 1;
+const BOOSTER_SIZE = COMMON_COUNT + UNCOMMON_COUNT + RARE_COUNT;
+let maxCardNumber = undefined;
 
 // Used for sorting the cards that get chosen for booster packs. (only relevant if the SORT_CARDS argument is true)
 const SORTED_CARDS = {
@@ -125,7 +127,7 @@ function parseCardHash() {
 
     Returns the number of missing cards for this rarity.
 */
-async function selectRareCard(missingCardCount) {
+async function selectRareCard(missingCardCount, cardsInBooster) {
     for (let r = 0; r < RARE_COUNT; r++) {
         // 12.5% chance for the Rare card in a booster pack to be a Mythic Rare card instead.
         const GET_MYTHIC_RARE_CARD = Math.floor(Math.random() * 8) < 1;
@@ -157,10 +159,7 @@ async function selectRareCard(missingCardCount) {
             }
         });
 
-        // Sort the card into SORTED_CARDS if necessary.
-        if (SORT_CARDS) {
-            await getCardFromCardNameAndSortIt(cardName);
-        }
+        cardsInBooster.push(cardName);
     }
 
     return missingCardCount;
@@ -174,7 +173,7 @@ async function selectRareCard(missingCardCount) {
 
     Returns the number of missing cards for this rarity.
 */
-async function selectUncommonCard(missingCardCount) {
+async function selectUncommonCard(missingCardCount, cardsInBooster) {
     for (let u = 0; u < (UNCOMMON_COUNT + missingCardCount); u++) {
         let cardName = sample(cardHash["uncommons"]);
 
@@ -194,10 +193,7 @@ async function selectUncommonCard(missingCardCount) {
             }
         });
 
-        // Sort the card into SORTED_CARDS if necessary.
-        if (SORT_CARDS) {
-            await getCardFromCardNameAndSortIt(cardName);
-        }
+        cardsInBooster.push(cardName);
     }
 
     return missingCardCount;
@@ -209,7 +205,7 @@ async function selectUncommonCard(missingCardCount) {
     PARAMS:
     -Takes a variable that will represent the number of missing cards (based on missing rarities)
 */
-async function selectCommonCard(missingCardCount) {
+async function selectCommonCard(missingCardCount, cardsInBooster) {
     for (let c = 0; c < (COMMON_COUNT + missingCardCount); c++) {
         let cardName = sample(cardHash["commons"]);
 
@@ -226,10 +222,7 @@ async function selectCommonCard(missingCardCount) {
             }
         });
 
-        // Sort the card into SORTED_CARDS if necessary.
-        if (SORT_CARDS) {
-            await getCardFromCardNameAndSortIt(cardName);
-        }
+        cardsInBooster.push(cardName);
     }
 }
 
@@ -238,15 +231,21 @@ async function selectCommonCard(missingCardCount) {
 */
 async function generateBoosterPack() {
     let missingCardCount = 0;
+    const CARDS_IN_BOOSTER = [];
 
     // Rares
-    missingCardCount = await selectRareCard(missingCardCount);
+    missingCardCount = await selectRareCard(missingCardCount, CARDS_IN_BOOSTER);
 
     // Uncommons
-    missingCardCount = await selectUncommonCard(missingCardCount);
+    missingCardCount = await selectUncommonCard(missingCardCount, CARDS_IN_BOOSTER);
 
     // Commons
-    await selectCommonCard(missingCardCount);
+    await selectCommonCard(missingCardCount, CARDS_IN_BOOSTER);
+
+    // Sort the booster pack's cards into SORTED_CARDS, if necessary.
+    if (SORT_CARDS) {
+        await getCardsFromCardNamesAndSortThem(CARDS_IN_BOOSTER);
+    }
 
     // Append a new line character to the booster file as a separator for each booster.
     FS.appendFileSync(FILE_NAME_BOOSTER, "\n", function(err) {
@@ -269,9 +268,6 @@ async function cardHasType(card, type) {
 async function addCardToSortedCardHash(card) {
     const CARD_NAME = card.name;
     const CARD_IS_LAND = await cardHasType(card, "Land");
-    
-    //testing
-    console.log(`CARD_IS_LAND: ${CARD_IS_LAND}`);
 
     if (CARD_IS_LAND) {
         SORTED_CARDS.lands.push(CARD_NAME);
@@ -281,7 +277,7 @@ async function addCardToSortedCardHash(card) {
 
         if (CARD_IS_MULTICOLORED) {
             //testing
-            console.log(`CARD IS MULTICOLORED - ${CARD_NAME} - ColorID:${card.colorIdentity} - Colors:${card.colors} - CMC:${card.cmc} - ManaCost:${card.manaCost}`);
+            // console.log(`CARD IS MULTICOLORED - ${CARD_NAME} - ColorID:${card.colorIdentity} - Colors:${card.colors} - CMC:${card.cmc} - ManaCost:${card.manaCost}`);
 
             // Multicolored cards.
             if (CARD_IS_CREATURE) {
@@ -290,7 +286,7 @@ async function addCardToSortedCardHash(card) {
                 SORTED_CARDS.multicolored.nonCreatures.push(CARD_NAME);
             }
         } else {
-            // Non-multicolored cards.
+            // Monocolored & colorless cards.
             const CARD_COLOR = (!card.colors) ? "" : card.colors[0].toLowerCase();
             switch (CARD_COLOR.toLowerCase()) {
                 case "white":
@@ -330,7 +326,7 @@ async function addCardToSortedCardHash(card) {
                     break;
                 default:
                     //testing
-                    console.log(`CARD IS COLORLESS - ${CARD_NAME} - ColorID:${card.colorIdentity} - Colors:${card.colors} - CMC:${card.cmc} - ManaCost:${card.manaCost}`);
+                    // console.log(`CARD IS COLORLESS - ${CARD_NAME} - ColorID:${card.colorIdentity} - Colors:${card.colors} - CMC:${card.cmc} - ManaCost:${card.manaCost}`);
 
                     if (CARD_IS_CREATURE) {
                         SORTED_CARDS.colorless.creatures.push(CARD_NAME);
@@ -346,16 +342,64 @@ async function addCardToSortedCardHash(card) {
     Takes a card's name and queries the corresponding card object.
     Then adds that card's name to the SORTED_CARDS hash based on some of the card's attributes.
 */
-async function getCardFromCardNameAndSortIt(_cardName) {
-    // Get the card object with this card's name and add it to SORTED_CARDS.
-    await MTG.card.where({ set: SET_CODE, name: _cardName })
-    .then(async cardsOnPage => {
-        const CARD = (!cardsOnPage || cardsOnPage.length === 0) ? "" : cardsOnPage[0];
+async function getCardsFromCardNamesAndSortThem(cardNames) {
+    // // Remove the second half of card names for double-sided cards. (It causes the card to be queries twice)
+    // cardNames = cardNames.map(cardName => {
+    //     const DOUBLE_SLASH_INDEX = cardName.indexOf(" // ");
 
-        if (CARD === "") {
-            throw(`!!! ERROR QUERYING CARD WITH NAME - ${_cardName}\n`);
-        } else {
-            await addCardToSortedCardHash(CARD);
+    //     //testing
+    //     console.log(`DOUBLE_SLASH_INDEX: ${DOUBLE_SLASH_INDEX}`);
+
+    //     let result = cardName;
+    //     if (DOUBLE_SLASH_INDEX !== -1) {
+    //         //testing
+    //         console.log(" // FOUND DOUBLE SLASH // ");
+    //         console.log(`cardName before: ${result}`);
+
+    //         result = cardName.substring(0, DOUBLE_SLASH_INDEX);
+
+    //         //testing
+    //         console.log(`cardName after: ${result}`);
+    //     }
+    //     return result;
+    // });
+
+    const PIPE_DELIMITED_CARD_NAMES = cardNames.join("|");
+
+    // Get the card objects that correspond to this booster's cards and add them to SORTED_CARDS.
+    await MTG.card.where({ set: SET_CODE, name: PIPE_DELIMITED_CARD_NAMES})
+    .then(async cardsInBooster => {
+        //testing
+        // console.log("~~~~~~~~~~~~~~~~~~~~");
+
+        // Add each card to the SORTED_CARDS hash, one at a time.
+        for (let i = 0; i < cardsInBooster.length; i++) {
+            const CARD = cardsInBooster[i];
+            
+            // Only accept cards that were the original version in the set, to avoid adding duplicate cards to the booster.
+            if (CARD.number <= maxCardNumber) {
+                const AMOUNT_OF_THIS_CARD_IN_BOOSTER = cardNames.filter(cardName => cardName === CARD.name).length;
+                for (let j = 0; j < AMOUNT_OF_THIS_CARD_IN_BOOSTER; j++) {
+                    // console.log(`TAKE: ${CARD.name} - ${CARD.rarity}`);
+                    await addCardToSortedCardHash(CARD);
+                }
+
+                /* 
+                    -Double-sided cards cause duplicates to be added because the back side gets added too, but i dont want that to happen.
+                    -So here we skip over the index of the back side that the query brought us.
+                */
+                const DOUBLE_SLASH_INDEX = CARD.name.indexOf(" // ");
+                const CARD_IS_DOUBLE_SIDED = DOUBLE_SLASH_INDEX !== -1;
+                if (CARD_IS_DOUBLE_SIDED) {
+                    i += 1;
+
+                    //testing
+                    // console.log(`~~~SKIP (backside): ${CARD.name} - ${CARD.rarity}`);
+                }
+            } else {
+                //testing
+                // console.log(`~~~SKIP: ${CARD.name} - ${CARD.rarity}`);
+            }
         }
     });
 }
@@ -366,6 +410,7 @@ async function getCardFromCardNameAndSortIt(_cardName) {
 async function main() {
     prepareBoosterFile();
     cardHash = parseCardHash();
+    maxCardNumber = cardHash.setSize;
 
     // Generate each card for the booster and write their names to the booster file.
     for (let i = 0; i < NUMBER_OF_BOOSTERS; i++) {
@@ -469,7 +514,7 @@ async function main() {
             concatenatedCards += "\n\n";
         }
 
-
+        // Write the sorted cards' names to their own file in sorted order.
         FS.writeFileSync(FILE_NAME_BOOSTER_SORTED, concatenatedCards, function(err) {
             if (err) {
                 throw(`!!! ERROR APPENDING TO SORTED BOOSTER FILE - ${FILE_NAME_BOOSTER_SORTED}\nERROR MESSAGE: ${err}`);
