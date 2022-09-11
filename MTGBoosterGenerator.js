@@ -343,27 +343,6 @@ async function addCardToSortedCardHash(card) {
     Then adds that card's name to the SORTED_CARDS hash based on some of the card's attributes.
 */
 async function getCardsFromCardNamesAndSortThem(cardNames) {
-    // // Remove the second half of card names for double-sided cards. (It causes the card to be queries twice)
-    // cardNames = cardNames.map(cardName => {
-    //     const DOUBLE_SLASH_INDEX = cardName.indexOf(" // ");
-
-    //     //testing
-    //     console.log(`DOUBLE_SLASH_INDEX: ${DOUBLE_SLASH_INDEX}`);
-
-    //     let result = cardName;
-    //     if (DOUBLE_SLASH_INDEX !== -1) {
-    //         //testing
-    //         console.log(" // FOUND DOUBLE SLASH // ");
-    //         console.log(`cardName before: ${result}`);
-
-    //         result = cardName.substring(0, DOUBLE_SLASH_INDEX);
-
-    //         //testing
-    //         console.log(`cardName after: ${result}`);
-    //     }
-    //     return result;
-    // });
-
     const PIPE_DELIMITED_CARD_NAMES = cardNames.join("|");
 
     // Get the card objects that correspond to this booster's cards and add them to SORTED_CARDS.
