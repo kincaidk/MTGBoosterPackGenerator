@@ -2,3 +2,4 @@ package-lock.json
 SetFiles/
 BoosterFiles/
 node_modules/
+test.js
