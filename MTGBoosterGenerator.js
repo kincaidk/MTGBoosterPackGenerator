@@ -277,7 +277,7 @@ async function addCardToSortedCardHash(card) {
 
         if (CARD_IS_MULTICOLORED) {
             //testing
-            console.log(`CARD IS MULTICOLORED - ${CARD_NAME} - types:${card.types} - Colors:${card.colors}`);
+            // console.log(`CARD IS MULTICOLORED - ${CARD_NAME} - types:${card.types} - Colors:${card.colors}`);
 
             // Multicolored cards.
             if (CARD_IS_CREATURE) {
@@ -290,10 +290,10 @@ async function addCardToSortedCardHash(card) {
             console.log(`CARD IS monoCOLORED - ${CARD_NAME} - types:${card.types} - Colors:${card.colors}`);
 
             // Monocolored & colorless cards.
-            const CARD_COLOR = (!card.colors) ? "" : card.colors[0].toLowerCase();
+            // const CARD_COLOR = (!card.colors) ? "" : card.colors[0].toLowerCase();
 
             //testing
-            console.log(`---CARD_COLOR variable: ${CARD_COLOR}`);
+            // console.log(`---CARD_COLOR variable: ${CARD_COLOR}`);
 
             switch (CARD_COLOR) {
                 case "w":
