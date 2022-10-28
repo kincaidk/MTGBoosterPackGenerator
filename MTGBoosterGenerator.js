@@ -530,22 +530,22 @@ main();
 
 
 //testing - delete everything beyond this point.
-async function test() {
-    await MTG.card.where({ set: SET_CODE, pageSize: 100, page: 3,  })
-    .then(async cardsOnPage => {
-        for (let i = 0; i < cardsOnPage.length; i++) {
-            const CARD = cardsOnPage[i];
+// async function test() {
+//     await MTG.card.where({ set: SET_CODE, pageSize: 100, page: 3,  })
+//     .then(async cardsOnPage => {
+//         for (let i = 0; i < cardsOnPage.length; i++) {
+//             const CARD = cardsOnPage[i];
             
-            //testing
-            console.log(`${CARD.name} --- ${CARD.colorIdentity} --- ${CARD.types}`);
+//             //testing
+//             console.log(`${CARD.name} --- ${CARD.colorIdentity} --- ${CARD.types}`);
 
-            await addCardToSortedCardHash(CARD);
-        }
-    });
+//             await addCardToSortedCardHash(CARD);
+//         }
+//     });
 
-    //testing
-    console.log("\nSORTED CARDS\n");
-    console.log(SORTED_CARDS);
-}
+//     //testing
+//     console.log("\nSORTED CARDS\n");
+//     console.log(SORTED_CARDS);
+// }
 
 // test();
