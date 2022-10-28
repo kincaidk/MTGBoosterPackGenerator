@@ -1,0 +1,16 @@
+version: 2.1
+
+workflows:
+  build-test:
+    jobs:
+      - build
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:16.17.0
+    steps:
+      - checkout
+      - run:
+          name: Test booster generation.
+          command: node MTGBoosterGenerator.js ELD
