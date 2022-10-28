@@ -1,6 +1,7 @@
 const MTG = require('mtgsdk');
 const FS = require('fs');
 const PATH = require('path');
+const { exec } = require("child_process");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /* --DESCRIPTION--
@@ -103,20 +104,16 @@ function prepareBoosterFile() {
     Reads the file that contains all the card in the designated set.
     Returns json that contains each card in the designatd set, organized by rarity.
 */
-function parseCardHash() {
+async function parseCardHash() {
     // Read and parse the contents of the file to get every card in the set.
-    if (FS.existsSync(FILE_NAME_FULL_SET)) {
-        const STRINGIFIED_CARD_HASH = FS.readFileSync(FILE_NAME_FULL_SET, {encoding: "utf8", flag: "r"});
-        const PARSED_CARD_HASH = JSON.parse(STRINGIFIED_CARD_HASH);
+    const STRINGIFIED_CARD_HASH = FS.readFileSync(FILE_NAME_FULL_SET, {encoding: "utf8", flag: "r"});
+    const PARSED_CARD_HASH = JSON.parse(STRINGIFIED_CARD_HASH);
 
-        if (typeof(PARSED_CARD_HASH) !== "object") {
-            throw(`!!! CARD HASH WAS NOT A HASH -- ${typeof(PARSED_CARD_HASH)}`);
-        }
-
-        return PARSED_CARD_HASH;
-    } else {
-        throw(`!!! FILE DID NOT EXIST -- ${FILE_NAME_FULL_SET}`);
+    if (typeof(PARSED_CARD_HASH) !== "object") {
+        throw(`!!! CARD HASH WAS NOT A HASH -- ${typeof(PARSED_CARD_HASH)}`);
     }
+
+    return PARSED_CARD_HASH;
 }
 
 /*
@@ -393,9 +390,12 @@ async function getCardsFromCardNamesAndSortThem(cardNames) {
 /*
     Main function.
 */
+// retrieveFullSet();
+
 async function main() {
     prepareBoosterFile();
-    cardHash = parseCardHash();
+    // await retrieveFullSet();
+    cardHash = await parseCardHash();
 
     try {
         maxCardNumber = cardHash.setSize;
@@ -526,26 +526,53 @@ async function main() {
                 //////// MAIN ////////
                 ////////      ////////
 //////////////////////////////////////
-main();
+
+const SET_CARDS_RETRIEVED = FS.existsSync(FILE_NAME_FULL_SET);
+
+// Retrieve the set cards if they haven't been already.
+if (!SET_CARDS_RETRIEVED) {
+    console.log(`! SET FILE DID NOT EXIST -- ${FILE_NAME_FULL_SET}`);
+    console.log(`Fetching set: ${SET_CODE}...`);
+
+    exec(`node MTGSetGenerator.js ${SET_CODE}`, (error, stdout, stderr) => {
+        console.log(`stdout: ${stdout}`);
+
+        if (error || stderr) {
+            console.log(`!!! SET ${SET_CODE} COULD NOT BE LOADED.`);
+        } else {
+            // Main (the set needed to be generated on the fly.)
+            main();
+        }
+    });
+} else {
+    // Main (the Set was pre-generated.)
+    main();
+}
+
+
+
+
+
+
 
 
 //testing - delete everything beyond this point.
-async function test() {
-    await MTG.card.where({ set: SET_CODE, pageSize: 100, page: 3,  })
-    .then(async cardsOnPage => {
-        for (let i = 0; i < cardsOnPage.length; i++) {
-            const CARD = cardsOnPage[i];
+// async function test() {
+//     await MTG.card.where({ set: SET_CODE, pageSize: 100, page: 3,  })
+//     .then(async cardsOnPage => {
+//         for (let i = 0; i < cardsOnPage.length; i++) {
+//             const CARD = cardsOnPage[i];
             
-            //testing
-            console.log(`${CARD.name} --- ${CARD.colorIdentity} --- ${CARD.types}`);
+//             //testing
+//             console.log(`${CARD.name} --- ${CARD.colorIdentity} --- ${CARD.types}`);
 
-            await addCardToSortedCardHash(CARD);
-        }
-    });
+//             await addCardToSortedCardHash(CARD);
+//         }
+//     });
 
-    //testing
-    console.log("\nSORTED CARDS\n");
-    console.log(SORTED_CARDS);
-}
+//     //testing
+//     console.log("\nSORTED CARDS\n");
+//     console.log(SORTED_CARDS);
+// }
 
 // test();

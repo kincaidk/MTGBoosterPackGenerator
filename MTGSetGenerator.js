@@ -107,6 +107,10 @@ async function main() {
     console.log(`\nTOTAL NUMBER OF DUPLICATE BASIC LANDS AMONG THE DUPLICATE CARDS: ${duplicateBasicLandsFound}`);
     console.log(`\nTOTAL NUMBER OF UNIQUE CARDS FOUND: ${totalNumberOfUniqueCardsFound}`);
 
+    if (totalNumberOfUniqueCardsFound === 0) {
+        throw(`!!! SET ${SET_CODE} NOT RECOGNIZED. NO CARDS FOUND.`);
+    }
+
     // The number of duplicate basic lands + the number of unique cards = the set size. (the set size is the maximum card number for any card in the set. This will be used to exclude alternate art when querying cards in the booster generator.)
     CARDS.setSize = duplicateBasicLandsFound + totalNumberOfUniqueCardsFound;
 
