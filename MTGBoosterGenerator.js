@@ -538,7 +538,7 @@ if (!SET_CARDS_RETRIEVED) {
         console.log(`stdout: ${stdout}`);
 
         if (error || stderr) {
-            console.log(`!!! SET ${SET_CODE} COULD NOT BE LOADED.`);
+            throw(`!!! SET ${SET_CODE} COULD NOT BE LOADED.`);
         } else {
             // Main (the set needed to be generated on the fly.)
             main();
