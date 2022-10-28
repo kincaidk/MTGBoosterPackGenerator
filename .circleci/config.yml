@@ -3,7 +3,6 @@ version: 2.1
 workflows:
   build-test:
     jobs:
-      - install-dependencies
       - build
 
 jobs:
@@ -14,13 +13,6 @@ jobs:
     steps:
       - run:
           name: Test booster generation.
-          command: node MTGBoosterGenerator.js ELD
-  # Installs dependencies using yarn (because the docker image has yarn instead of npm.)
-  install-dependencies:
-    docker:
-      - image: cimg/node:16.17.0
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies (yarn).
-          command: yarn install
+          command: |
+            yarn install
+            node MTGBoosterGenerator.js ELD
