@@ -13,7 +13,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Test booster generation.
-          command: |
-            yarn install
-            node MTGBoosterGenerator.js ELD
+          name: Install dependencies.
+          command: yarn install
+      - run:
+          name: Generate a booster.
+          command: node MTGBoosterGenerator.js ELD
+
+            
