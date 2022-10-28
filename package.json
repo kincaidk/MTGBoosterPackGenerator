@@ -4,7 +4,7 @@
   "description": "Generate booster packs for Magic: The Gathering.",
   "main": "MTGBoosterGenerator.js",
   "scripts": {
-    "test": "node MTGSetGenerator.js NEO && node MTGBoosterGenerator.js NEO 6"
+    "test": "node MTGBoosterGenerator.js ELD"
   },
   "repository": {
     "type": "git",

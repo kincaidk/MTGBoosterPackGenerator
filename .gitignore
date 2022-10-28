@@ -3,3 +3,4 @@ SetFiles/
 BoosterFiles/
 node_modules/
 test.js
+yarn.lock
