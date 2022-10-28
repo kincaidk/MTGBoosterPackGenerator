@@ -4,9 +4,7 @@ workflows:
   build-test:
     jobs:
       - install-dependencies
-      - build:
-        requires:
-          - install-dependencies
+      - build
 
 jobs:
   # Generates a booster
