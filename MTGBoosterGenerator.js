@@ -101,7 +101,7 @@ function prepareBoosterFile() {
 }
 
 /*
-    Reads the file that contains all the card in the designated set.
+    Reads the file that contains all the cards in the designated set.
     Returns json that contains each card in the designatd set, organized by rarity.
 */
 async function parseCardHash() {
