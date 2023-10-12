@@ -83,7 +83,7 @@ function sample(arrayToSample) {
 }
 
 /*
-    Creates the file that booster packs will reside.
+    Creates the file where booster packs will reside.
     Also creates the BoosterFiles directory, if it doesn't exist.
 */
 function prepareBoosterFile() {
