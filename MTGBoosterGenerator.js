@@ -48,7 +48,6 @@ let cardHash = null;
 const COMMON_COUNT = 11;
 const UNCOMMON_COUNT = 3;
 const RARE_COUNT = 1;
-const BOOSTER_SIZE = COMMON_COUNT + UNCOMMON_COUNT + RARE_COUNT;
 let maxCardNumber = undefined;
 
 // Used for sorting the cards that get chosen for booster packs. (only relevant if the SORT_CARDS argument is true)
