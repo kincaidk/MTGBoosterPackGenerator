@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kincaidk/MTGBoosterPackGenerator#readme",
   "dependencies": {
+    "cypress": "^10.11.0",
     "mtgsdk": "^1.0.0"
   }
 }
