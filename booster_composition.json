@@ -1,0 +1,43 @@
+[
+    {
+        "setCode": "default",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"}
+        ]
+    },
+    {
+        "setCode": "STX",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"subtypes": "Lesson"},
+            {"set": "STA"}
+        ]
+    }
+]
+

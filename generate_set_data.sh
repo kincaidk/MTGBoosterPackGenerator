@@ -44,6 +44,13 @@ done
 allCardNames=$(jq --raw-output '[.[] | select(.number | test("^A-") | not) | select(.name | test("^Island|Mountain|Plains|Swamp|Forest$"; "i") | not)] | map(.name) | unique | .[]' "${allCardsFilePath}")
 echo "$allCardNames" >> "${dirName}/all_${setCode}_cards.txt"
 
+if [ -z "$allCardNames" ]
+then
+    echo "!!! ERROR - NO CARDS IN SET: ${setCode}"
+    rm -r -f "$dirName"
+    exit 1
+fi
+
 # Commons
 commonCards=$(jq --raw-output '[.[] | select(.number | test("^A-") | not) | select(.name | test("^Island|Mountain|Plains|Swamp|Forest$"; "i") | not) | select(.rarity=="Common")] | map(.name) | unique | .[]' "${allCardsFilePath}")
 echo "$commonCards" >> "${dirName}/common_${setCode}_cards.txt"
