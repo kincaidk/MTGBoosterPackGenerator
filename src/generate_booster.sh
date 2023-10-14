@@ -8,6 +8,18 @@ _jq() {
 setCode=$1              # 3-letter set code.
 numberOfBoosters=$2     # The number of booster packs to generate.
 
+if [ -z $setCode ]
+then
+    echo "!!! ERROR - First argument must be a 3-letter set code."
+    exit 1
+fi
+
+if [ -z $numberOfBoosters ]
+then
+    echo "!!! ERROR - Second argument must be a number. This is how many booster packs to generate."
+    exit 1
+fi
+
 # Path variables.
 setDataDirectory="set_data/${setCode}_set_data"
 boosterPackDirectory="booster_packs"
@@ -18,6 +30,13 @@ boosterCompositionFilePath="src/booster_composition.json"
 if [ ! -d "$setDataDirectory" ]
 then
     bash "src/generate_set_data.sh" "${setCode}" 
+fi
+
+# Exit if the set couldn't be generated.
+if [ ! -d "$setDataDirectory" ]
+then
+    echo "!!! ERROR - SET NOT FOUND: ${setCode}"
+    exit 1
 fi
 
 # Create necessary directories and files.
@@ -56,8 +75,17 @@ for ((i=0; i<$numberOfBoosters; i++)); do
                 ;;
             *)
                 decodedRow=$(echo "$row" | base64 --decode --ignore-garbage)
-                urlSlugToGetCard=$(echo "$decodedRow" | jq '. | to_entries[] | "&\(.key)=\(.value)&pageSize=100"' | tr -d '"') # TODO: This will fail to get every card if there are more than 100.
-                specialCard=$(curl -s "https://api.magicthegathering.io/v1/cards?set=${setCode}${urlSlugToGetCard}" | jq --raw-output '[.cards[] | select(.number | test("^A-") | not)] | map(.name) | unique | .[]' | shuf -n 1)
+                urlSlugToGetCard=$(echo "$decodedRow" | jq '. | to_entries[] | "&\(.key)=\(.value)"' | tr -d '"' | tr -d '\n'  | tr -d '\r') # TODO: This will fail to get every card if there are more than 100.
+                
+                #testing
+                echo "urlSlugToGetCard: ${urlSlugToGetCard}"
+                
+                urlForCard="https://api.magicthegathering.io/v1/cards?set=${setCode}${urlSlugToGetCard}"
+                
+                #testing
+                echo "urlForCard: ${urlForCard}"
+
+                specialCard=$(curl -s "$urlForCard" | jq --raw-output '[.cards[] | select(.number | test("^A-") | not)] | map(.name) | unique | .[]' | shuf -n 1)
                 echo "$specialCard" >> "$boosterFile"
                 ;;
         esac
