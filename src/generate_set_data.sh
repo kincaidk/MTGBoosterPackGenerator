@@ -4,6 +4,8 @@
 setCode=$1
 dirName="set_data/${setCode}_set_data"
 
+echo "GENERATING SET: ${setCode}"
+
 rm -r -f "$dirName"
 mkdir -p "$dirName"
 allCardsFilePath="${dirName}/all_${setCode}_cards.json"
