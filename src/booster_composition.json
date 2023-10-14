@@ -38,6 +38,26 @@
             {"subtypes": "Lesson"},
             {"set": "STA"}
         ]
+    },
+    {
+        "setCode": "BRO",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"set": "BRR"}
+        ]
     }
 ]
 
