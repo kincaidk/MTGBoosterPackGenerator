@@ -56,11 +56,10 @@ fi
 for ((i=0; i<$numberOfBoosters; i++)); do
     for row in $(echo "${boosterComposition}" | jq -r '.[] | @base64'); do
         rarity=$(_jq "${row}" '.rarity')
-
+        card=""
         case "$rarity" in
             "common"|"uncommon")
                 card=$(sed '/^\s*$/d' "${setDataDirectory}/${rarity}_${setCode}_cards.txt" | shuf -n 1)
-                echo "$card" >> "$boosterFile"
                 ;;
             "rare")
                 # Rares have a 1/8 chance of being mythics.
@@ -71,24 +70,16 @@ for ((i=0; i<$numberOfBoosters; i++)); do
                 fi
 
                 card=$(sed '/^\s*$/d' "${setDataDirectory}/${rarity}_${setCode}_cards.txt" | shuf -n 1)
-                echo "$card" >> "$boosterFile"
                 ;;
             *)
                 decodedRow=$(echo "$row" | base64 --decode --ignore-garbage)
                 urlSlugToGetCard=$(echo "$decodedRow" | jq '. | to_entries[] | "&\(.key)=\(.value)"' | tr -d '"' | tr -d '\n'  | tr -d '\r') # TODO: This will fail to get every card if there are more than 100.
-                
-                #testing
-                echo "urlSlugToGetCard: ${urlSlugToGetCard}"
-                
                 urlForCard="https://api.magicthegathering.io/v1/cards?set=${setCode}${urlSlugToGetCard}"
-                
-                #testing
-                echo "urlForCard: ${urlForCard}"
-
-                specialCard=$(curl -s "$urlForCard" | jq --raw-output '[.cards[] | select(.number | test("^A-") | not)] | map(.name) | unique | .[]' | shuf -n 1)
-                echo "$specialCard" >> "$boosterFile"
+                card=$(curl -s "$urlForCard" | jq --raw-output '[.cards[] | select(.number | test("^A-") | not)] | map(.name) | unique | .[]' | shuf -n 1)
                 ;;
         esac
+
+        echo "01 $card" >> "$boosterFile"
     done
 
     echo "" >> "$boosterFile" # Separaion between booster packs.
