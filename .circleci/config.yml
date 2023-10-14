@@ -6,7 +6,7 @@ workflows:
       - build
 
 jobs:
-  # Generates a booster
+  # Generates boosters
   build:
     docker:
       - image: cimg/node:16.17.0
@@ -16,7 +16,12 @@ jobs:
           name: Install dependencies.
           command: yarn install
       - run:
-          name: Generate a booster.
-          command: node MTGBoosterGenerator.js ELD
-
+          name: Generate a booster from a normal set.
+          command: bash src/generate_booster.sh ELD 1
+      - run:
+          name: Generate a booster from a set with an expansion.
+          command: bash src/generate_booster.sh STX 1
+      - run:
+          name: Generate multiple boosters.
+          command: bash src/generate_booster.sh KHM 6
             

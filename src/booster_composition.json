@@ -1,0 +1,123 @@
+[
+    {
+        "setCode": "default",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"}
+        ]
+    },
+    {
+        "setCode": "KHM",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"supertypes":"snow","types":"land"}
+        ]
+    },
+    {
+        "setCode": "STX",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"subtypes": "Lesson"},
+            {"set": "STA"}
+        ]
+    },
+    {
+        "setCode": "BRO",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"set": "BRR"}
+        ]
+    },
+    {
+        "setCode": "MOM",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"layout":"transform"},
+            {"types": "Battle"},
+            {"set": "MUL"}
+        ]
+    },
+    {
+        "setCode": "WOE",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"set": "WOT"}
+        ]
+    }
+]
+
