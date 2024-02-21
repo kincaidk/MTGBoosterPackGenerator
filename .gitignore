@@ -2,7 +2,6 @@ SetFiles/
 BoosterFiles/
 node_modules/
 test.js
-yarn.lock
 *deleteme*
 set_data
 booster_packs
