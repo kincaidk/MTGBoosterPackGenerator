@@ -119,6 +119,8 @@
             {"set": "WOT"}
         ]
     },
+
+    
     {
         "setCode": "MKM",
         "booster": [
@@ -129,14 +131,13 @@
             {"rarity":"common"},
             {"rarity":"common"},
             {"rarity":"common"},
-            {"rarity":["common", "uncommon"]},
-            {"rarity":["common", "rare"]},
             {"rarity":"uncommon"},
             {"rarity":"uncommon"},
             {"rarity":"uncommon"},
-            {"rarity":["uncommon","rare"]},
-            {"rarity":["uncommon","rare"]},
-            {"rarity":"rare"}
+            {"rarity":"rare"},
+            {"rarity":["common","uncommon","rare"]},
+            {"rarity":["common","uncommon","rare"]},
+            {"rarity":["common","uncommon","rare"]}
         ]
     }
 ]
