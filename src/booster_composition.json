@@ -36,7 +36,7 @@
             {"rarity":"uncommon"},
             {"rarity":"uncommon"},
             {"rarity":"rare"},
-            {"supertypes":"snow","types":"land"}
+            {"type":["land", "snow"]}
         ]
     },
     {
@@ -55,7 +55,7 @@
             {"rarity":"uncommon"},
             {"rarity":"uncommon"},
             {"rarity":"rare"},
-            {"subtypes": "Lesson"},
+            {"type": "Lesson"},
             {"set": "STA"}
         ]
     },
@@ -95,7 +95,7 @@
             {"rarity":"uncommon"},
             {"rarity":"rare"},
             {"layout":"transform"},
-            {"types": "Battle"},
+            {"type": "Battle"},
             {"set": "MUL"}
         ]
     },
@@ -117,6 +117,26 @@
             {"rarity":"uncommon"},
             {"rarity":"rare"},
             {"set": "WOT"}
+        ]
+    },
+    {
+        "setCode": "MKM",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":["common", "uncommon"]},
+            {"rarity":["common", "rare"]},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":["uncommon","rare"]},
+            {"rarity":["uncommon","rare"]},
+            {"rarity":"rare"}
         ]
     }
 ]

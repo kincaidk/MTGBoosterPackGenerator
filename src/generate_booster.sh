@@ -1,9 +1,5 @@
 #!/bin/bash
 
-_jq() {
-    echo "${1}" | base64 --decode --ignore-garbage | jq -r "${2}"
-}
-
 # Arguments.
 setCode=$1              # 3-letter set code.
 numberOfBoosters=$2     # The number of booster packs to generate.
@@ -55,7 +51,8 @@ fi
 # Generate booster(s).
 for ((i=0; i<$numberOfBoosters; i++)); do
     for row in $(echo "${boosterComposition}" | jq -r '.[] | @base64'); do
-        rarity=$(_jq "${row}" '.rarity')
+        randomNumber=$((1 + $RANDOM % 100)) # Generates a random number between 1 (inclusive) & 100 (inclusive)
+        rarity=$(echo "${row}" | base64 --decode --ignore-garbage | jq --raw-output --arg _randomNumber "${randomNumber}" '. | to_entries[].value | if type=="array" then .[($_randomNumber | tonumber) % length] else . end')
         card=""
         case "$rarity" in
             "common"|"uncommon")
@@ -73,14 +70,28 @@ for ((i=0; i<$numberOfBoosters; i++)); do
                 ;;
             *)
                 decodedRow=$(echo "$row" | base64 --decode --ignore-garbage)
-                urlSlugToGetCard=$(echo "$decodedRow" | jq '. | to_entries[] | "&\(.key)=\(.value)"' | tr -d '"' | tr -d '\n'  | tr -d '\r') # TODO: This will fail to get every card if there are more than 100.
-                urlForCard="https://api.magicthegathering.io/v1/cards?set=${setCode}${urlSlugToGetCard}"
-                card=$(curl -s "$urlForCard" | jq --raw-output '[.cards[] | select(.number | test("^A-") | not)] | map(.name) | unique | .[]' | shuf -n 1)
+   
+                key=$(echo "$decodedRow" | jq '. | to_entries[] | "\(.key)"' | tr -d '"' | tr -d '\n'  | tr -d '\r')
+                queryParam=$(echo "$decodedRow" | jq --arg _key "$key" '. | to_entries[].value | if type=="array" then map($_key+":"+.) | reduce .[] as $item (""; .+"+"+$item) else "+"+$_key+":"+. end' | tr -d '"' | tr -d '\n'  | tr -d '\r')
+
+                urlSlugToGetCard=""
+
+                # If the set wasnt specified, use the current set.
+                if [ "${key}" != "set" ]
+                then
+                    urlSlugToGetCard+="set:${setCode}"
+                fi
+
+                urlSlugToGetCard+="${queryParam}"
+                urlForCards="https://api.scryfall.com/cards/search?q=${urlSlugToGetCard}"
+                card=$(curl -s "$urlForCards" | jq --raw-output '[.data[] | select(.collector_number | test("^A-") | not)] | map(.name) | unique | .[]' | shuf -n 1)
                 ;;
         esac
 
         echo "01 $card" >> "$boosterFile"
     done
 
-    echo "" >> "$boosterFile" # Separaion between booster packs.
+    echo "" >> "$boosterFile" # Separation between booster packs.
 done
+
+echo "${numberOfBoosters} ${setCode} BOOSTERS GENERATED"
