@@ -43,5 +43,9 @@
             "Treacherous Terrain",
             "Worldspine Wurm"
         ]
+    },
+    {
+        "setCode": "OTJ",
+        "listSetCode": "BIG"
     }
 ]

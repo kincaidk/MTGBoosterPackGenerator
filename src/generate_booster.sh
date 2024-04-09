@@ -50,49 +50,20 @@ then
 fi
 
 # Determine cards from the list
-thisSetUsesTheList=true
-
-readarray -t cardsFromTheList < <(jq -r ".[] | select(.setCode==\"${setCode}\") | .cards[]" "$theListFilePath")
-readarray -t specialGuestCardNames < <(curl -s 'https://api.scryfall.com/cards/search?q=set:spg' | jq '.data | map(.name) | .[]' | tr -d '"')
-
-if [ -z "$cardsFromTheList" ]
-then
-    thisSetUsesTheList=false
-fi
+listSetCode=$(jq -r ".[] | select(.setCode==\"${setCode}\") | .listSetCode" "$theListFilePath") && readarray -t cardsFromTheList < <(curl -s "https://api.scryfall.com/cards/search?q=set:${listSetCode}" | jq '.data | map(.name) | .[]' | tr -d '"') || readarray -t cardsFromTheList < <(jq -r ".[] | select(.setCode==\"${setCode}\") | .cards[]" "$theListFilePath") #|| listSetCode=$(jq -r ".[] | select(.setCode==\"${setCode}\") | .listSetCode" "$theListFilePath") && readarray -t cardsFromTheList < <(curl -s "https://api.scryfall.com/cards/search?q=set:${listSetCode}" | jq '.data | map(.name) | .[]' | tr -d '"')
+readarray -t specialGuestCardNames < <(curl -s 'https://api.scryfall.com/cards/search?q=set:SPG' | jq '.data | map(.name) | .[]' | tr -d '"')
 
 # Generate booster(s).
 for ((i=0; i<$numberOfBoosters; i++)); do
-    canIncludeCardFromTheList="$thisSetUsesTheList"
-
+    packNumber=$((i+1))
     for row in $(echo "${boosterComposition}" | jq -r '.[] | @base64'); do
         randomNumber=$((1 + $RANDOM % 10000)) # Generates a random number between 1 (inclusive) & 10000 (inclusive). This is also used later for The List, so keep it 10000.
         rarity=$(echo "${row}" | base64 --decode --ignore-garbage | jq --raw-output --arg _randomNumber "${randomNumber}" '. | to_entries[].value | if type=="array" then .[($_randomNumber | tonumber) % length] else . end')
         card=""
         case "$rarity" in
             "common")
-                # 1250 / 10000 is 12.5%, which is the chance of a common being replaced with a card from The List.
-                # Note this can only happen once per Play Booster pack.
-                if [[ "$randomNumber" -le 1250 ]] && [[ "$canIncludeCardFromTheList" = true ]]; 
-                then
-                    # 156 / 10000 is 1.56%, which is the chance of a common being replaced with a Special Guests list card.
-                    if [[ "$randomNumber" -le 156 ]]
-                    then
-                        numberOfCardsInTheSpecialGuests=${#specialGuestCardNames[@]} # <---- Array length
-                        randomIndex=$(($randomNumber % $numberOfCardsInTheSpecialGuests))
-                        card=${specialGuestCardNames[$randomIndex]}     
-                        echo "--- SPECIAL GUEST CARD in pack $((i+1)) --> ${card}"
-                    else
-                        # Get a card from The List for the target set.
-                        numberOfCardsInTheList=${#cardsFromTheList[@]} # <---- Array length 
-                        randomIndex=$(($randomNumber % $numberOfCardsInTheList))
-                        card=${cardsFromTheList[$randomIndex]}
-                        echo "---TRIGGERED THE LIST in pack $((i+1)) --> ${card}"
-                    fi
-                    canIncludeCardFromTheList=false
-                else
-                    # Get a normal common from the target set.
-                    card=$(sed '/^\s*$/d' "${setDataDirectory}/${rarity}_${setCode}_cards.txt" | shuf -n 1)
-                fi
+                # Get a common from the target set.
+                card=$(sed '/^\s*$/d' "${setDataDirectory}/${rarity}_${setCode}_cards.txt" | shuf -n 1)
                 ;;
             "uncommon")
                 # Get an uncommon from the target set.
@@ -107,6 +78,24 @@ for ((i=0; i<$numberOfBoosters; i++)); do
                 fi
 
                 card=$(sed '/^\s*$/d' "${setDataDirectory}/${rarity}_${setCode}_cards.txt" | shuf -n 1)
+                ;;
+            "list")
+                # Get a card from the list for this set.
+                # 781 / 10000 is 7.81%, which is the chance of a List card being a Special Guest card.
+                randomNumber=$((1 + $RANDOM % 10000))
+                if [[ "$randomNumber" -le 781 ]]
+                then
+                    numberOfCardsInTheSpecialGuests=${#specialGuestCardNames[@]} # <---- Array length
+                    randomIndex=$(($randomNumber % $numberOfCardsInTheSpecialGuests))
+                    card=${specialGuestCardNames[$randomIndex]}     
+                    echo "--- SPECIAL GUEST CARD in pack ${packNumber} --> ${card}"
+                else
+                    # Get a card from The List for the target set.
+                    numberOfCardsInTheList=${#cardsFromTheList[@]} # <---- Array length 
+                    randomIndex=$(($randomNumber % $numberOfCardsInTheList))
+                    card=${cardsFromTheList[$randomIndex]}
+                    echo "---TRIGGERED THE LIST in pack ${packNumber} --> ${card}"
+                fi
                 ;;
             *)
                 decodedRow=$(echo "$row" | base64 --decode --ignore-garbage)
@@ -128,9 +117,11 @@ for ((i=0; i<$numberOfBoosters; i++)); do
                 ;;
         esac
 
+        
         echo "01 $card" >> "$boosterFile"
     done
 
+    echo "PACK ${packNumber} COMPLETE"
     echo "" >> "$boosterFile" # Separation between booster packs.
 done
 
