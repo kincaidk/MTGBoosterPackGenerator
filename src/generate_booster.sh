@@ -50,7 +50,10 @@ then
 fi
 
 # Determine cards from the list
-listSetCode=$(jq -r ".[] | select(.setCode==\"${setCode}\") | .listSetCode" "$theListFilePath") && readarray -t cardsFromTheList < <(curl -s "https://api.scryfall.com/cards/search?q=set:${listSetCode}" | jq '.data | map(.name) | .[]' | tr -d '"') || readarray -t cardsFromTheList < <(jq -r ".[] | select(.setCode==\"${setCode}\") | .cards[]" "$theListFilePath") #|| listSetCode=$(jq -r ".[] | select(.setCode==\"${setCode}\") | .listSetCode" "$theListFilePath") && readarray -t cardsFromTheList < <(curl -s "https://api.scryfall.com/cards/search?q=set:${listSetCode}" | jq '.data | map(.name) | .[]' | tr -d '"')
+listSetCode=$(jq -r ".[] | select(.setCode==\"${setCode}\") | .listSetCode" "$theListFilePath") && \
+readarray -t cardsFromTheList < <(curl -s "https://api.scryfall.com/cards/search?q=set:${listSetCode}" | jq '.data | map(.name) | .[]' | tr -d '"') || \
+readarray -t cardsFromTheList < <(jq -r ".[] | select(.setCode==\"${setCode}\") | .cards[]" "$theListFilePath") # This is for sets whose List contents can't be retrieved with a set code.
+
 readarray -t specialGuestCardNames < <(curl -s 'https://api.scryfall.com/cards/search?q=set:SPG' | jq '.data | map(.name) | .[]' | tr -d '"')
 
 # Generate booster(s).
