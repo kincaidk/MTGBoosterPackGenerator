@@ -120,11 +120,10 @@
         ]
     },
 
-    
+    {"BELOW ARE SETS THAT USE":"PLAY BOOSTERS"},
     {
         "setCode": "MKM",
         "booster": [
-            {"rarity":"common"},
             {"rarity":"common"},
             {"rarity":"common"},
             {"rarity":"common"},
@@ -135,6 +134,26 @@
             {"rarity":"uncommon"},
             {"rarity":"uncommon"},
             {"rarity":"rare"},
+            {"rarity":["common","common","common","common","common","common","common","list"]},
+            {"rarity":["common","uncommon","rare"]},
+            {"rarity":["common","uncommon","rare"]},
+            {"rarity":["common","uncommon","rare"]}
+        ]
+    },
+    {
+        "setCode": "OTJ",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"set":"OTP"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"rarity":["common","common","common","common","list"]},
             {"rarity":["common","uncommon","rare"]},
             {"rarity":["common","uncommon","rare"]},
             {"rarity":["common","uncommon","rare"]}
