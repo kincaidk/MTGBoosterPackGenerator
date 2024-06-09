@@ -158,6 +158,25 @@
             {"rarity":["common","uncommon","rare"]},
             {"rarity":["common","uncommon","rare"]}
         ]
+    },
+    {
+        "setCode": "MH3",
+        "booster": [
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"common"},
+            {"rarity":"commonOrSpecialGuest"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"uncommon"},
+            {"rarity":"rare"},
+            {"rarity":["common","uncommon","rare"]},
+            {"rarity":["common","uncommon","rare"]},
+            {"set":"H2R"},
+            {"watermark":"set"}
+        ]
     }
 ]
 

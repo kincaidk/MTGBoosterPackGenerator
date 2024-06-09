@@ -9,7 +9,7 @@ jobs:
   # Generates boosters
   build:
     docker:
-      - image: cimg/node:16.17.0
+      - image: cimg/node:current
     steps:
       - checkout
       - run:
