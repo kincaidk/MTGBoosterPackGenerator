@@ -100,6 +100,20 @@ for ((i=0; i<$numberOfBoosters; i++)); do
                     echo "---TRIGGERED THE LIST in pack ${packNumber} --> ${card}"
                 fi
                 ;;
+            "commonOrSpecialGuest")
+                # 1/64 chance of this common instead being a Special Guest card.
+                randomNumber=$((1 + $RANDOM % 6400))
+                if [[ "$randomNumber" -le 100 ]]
+                then
+                    numberOfCardsInTheSpecialGuests=${#specialGuestCardNames[@]} # <---- Array length
+                    randomIndex=$(($randomNumber % $numberOfCardsInTheSpecialGuests))
+                    card=${specialGuestCardNames[$randomIndex]}     
+                    echo "--- SPECIAL GUEST CARD in pack ${packNumber} --> ${card}"
+                else
+                    # Get a common.
+                    card=$(sed '/^\s*$/d' "${setDataDirectory}/common_${setCode}_cards.txt" | shuf -n 1)
+                fi
+                ;;
             *)
                 decodedRow=$(echo "$row" | base64 --decode --ignore-garbage)
    
@@ -108,7 +122,7 @@ for ((i=0; i<$numberOfBoosters; i++)); do
 
                 urlSlugToGetCard=""
 
-                # If the set wasnt specified, use the current set.
+                # If the set wasnt specified in the booster composition, use the set that was provided as a command line argument.
                 if [ "${key}" != "set" ]
                 then
                     urlSlugToGetCard+="set:${setCode}"
